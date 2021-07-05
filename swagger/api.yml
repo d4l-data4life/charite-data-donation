@@ -1,0 +1,33 @@
+openapi: "3.0.2"
+info:
+  title: Charite Data Donation RESTful(ish)Api
+  version: "1.0"
+  description: The API for data donation from the covapp to charite
+servers:
+  - url: https://data-donation.locall/api/v1
+    description: Charite Data Donation RESTful(ish)Api
+
+paths:
+  /donations:
+    post:
+      summary: Send data to be donated
+      description: Send postal code and risk case to be donated
+      requestBody:
+        description: Data donation payload
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                postalCode:
+                  type: string
+                riskCase:
+                  type: integer
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: BAD REQUEST, if the payload was invalid
+        "500":
+          description: INTERNAL SERVER ERROR, if there was a database error

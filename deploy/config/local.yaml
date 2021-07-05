@@ -1,0 +1,15 @@
+VARS:
+  CHARITE_DATA_DONATION_HOST: data-donation.local
+  CHARITE_DATA_DONATION_PORT: 4444
+  CHARITE_DATA_DONATION_CORS_HOSTS: '*'
+IMAGE_REPOSITORY: ''
+IP_WHITELIST: 0.0.0.0/0
+
+# only for local
+APP: charite-data-donation
+GIT_COMMIT_ID: latest
+DB_HOST: postgres.default.svc.cluster.local
+DB_PORT: 5432
+DB_NAME: charite-data-donation
+DB_USER: charite-data-donation
+DB_PASS: charite-data-donation

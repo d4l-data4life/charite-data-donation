@@ -1,0 +1,15 @@
+# kubetpl:syntax:go-template
+kind: Service
+apiVersion: v1
+metadata:
+  name: charite-data-donation
+  labels:
+    app: charite-data-donation
+spec:
+  selector:
+    app: charite-data-donation
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: {{ .VARS.CHARITE_DATA_DONATION_PORT }}
+  type: ClusterIP

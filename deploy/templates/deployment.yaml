@@ -1,0 +1,71 @@
+# kubetpl:syntax:go-template
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "charite-data-donation"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: charite-data-donation
+      app.kubernetes.io/name: charite-data-donation
+      role: deployment
+  template:
+    metadata:
+      labels: # Changing labels makes rolling updates impossible. One needs to delete the deployment manually and then deploy it again with new labels
+        app.kubernetes.io/name: "charite-data-donation"
+        app: charite-data-donation
+        role: deployment
+      annotations:
+        prometheus.io/scrape: "true"
+    spec:
+      containers:
+      - name: charite-data-donation
+        image: {{ .IMAGE_REPOSITORY }}{{ .APP }}:{{ .GIT_COMMIT_ID }}
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: {{ .VARS.CHARITE_DATA_DONATION_PORT }}
+        env:
+        - name: CHARITE_DATA_DONATION_DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .APP }}-configmap
+              key: host
+        - name: CHARITE_DATA_DONATION_DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .APP }}-configmap
+              key: port
+        - name: CHARITE_DATA_DONATION_DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: {{ .APP }}-secret
+              key: password
+        - name: CHARITE_DATA_DONATION_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: {{ .APP }}-secret
+              key: username
+        - name: CHARITE_DATA_DONATION_DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .APP }}-configmap
+              key: dbName
+        {{ range $key, $value := .VARS }}
+        - name: {{ $key }}
+          value: "{{ $value }}"
+        {{ end }}
+        livenessProbe:
+          httpGet:
+            path: /checks/liveness
+            port: {{ .VARS.CHARITE_DATA_DONATION_PORT }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /checks/readiness
+            port: {{ .VARS.CHARITE_DATA_DONATION_PORT }}
+          initialDelaySeconds: 10
+          periodSeconds: 20
+      imagePullSecrets:
+      - name: gesundheitscloud-regsecret
